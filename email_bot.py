@@ -45,8 +45,8 @@ def check_and_update_thresholds(stock, current_price):
 
 def send_email_alert(subject, body, to_email):
     # Email account credentials
-    sender_email = "stockalert@zohomailcloud.ca"
-    sender_password = "Akshatronit1!"  # Consider using environment variables for security
+    sender_email = "stockbotalerter@gmail.com"
+    sender_password = "gxso omri zxvl ikhe"  # Consider using environment variables for security
 
     # Compose the email
     msg = EmailMessage()
@@ -56,7 +56,7 @@ def send_email_alert(subject, body, to_email):
     msg.set_content(body)
 
     # Connect to Gmail SMTP server (or your provider's SMTP)
-    with smtplib.SMTP('smtp.zohocloud.ca', 587) as smtp:
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
         smtp.ehlo()
         smtp.starttls()
         smtp.login(sender_email, sender_password)

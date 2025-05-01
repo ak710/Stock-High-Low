@@ -5,12 +5,33 @@ import os
 import pandas as pd
 from datetime import datetime, timedelta
 import os
-from pyairtable import Table
-from dotenv import load_dotenv
+from pyairtable import Api
 
+AIRTABLE_TOKEN = "patNEKm0aXuQ8djrb.0444341226d0539c89e8d55e0ab4a181410446dd1d2bf4b5b2d9131ace6061e2"
+AIRTABLE_BASE_ID = "appjnZkgUkiB12Dq3"
+AIRTABLE_TABLE_NAME = "stocks"
 
-DATA_FILE = "ticker_data.json"
-# Check if the text file exists, if not create it
+def get_airtable_table():
+    api = Api(AIRTABLE_TOKEN)
+    return api.table(AIRTABLE_BASE_ID, AIRTABLE_TABLE_NAME)
+
+def save_to_airtable(data):
+    table = get_airtable_table()
+    table.create(data)
+
+def load_from_airtable():
+    table = get_airtable_table()
+    records = table.all()
+    # Convert Airtable records to your expected format
+    return [rec['fields'] for rec in records]
+
+def delete_from_airtable(ticker):
+    table = get_airtable_table()
+    # Find record by ticker and delete
+    for rec in table.all():
+        if rec['fields'].get('ticker', '').upper() == ticker.upper():
+            table.delete(rec['id'])
+            break
 
 def is_duplicate_ticker(ticker, saved_data):
     return any(item['ticker'].upper() == ticker.upper() for item in saved_data)
@@ -51,29 +72,12 @@ def get_price_ranges(ticker):
         st.error(f"Error fetching data: {str(e)}")
         return None
 
-def save_to_file(data):
-    """Append data to JSON file"""
-    with open(DATA_FILE, "a") as f:
-        f.write(json.dumps(data) + "\n")
-
-def load_from_file():
-    """Load all ticker data from JSON file"""
-    try:
-        with open(DATA_FILE, "r") as f:
-            return [json.loads(line) for line in f]
-    except FileNotFoundError:
-        return []
-    
-def save_all(data):
-        with open(DATA_FILE, "w") as f:
-            for item in data:
-                f.write(json.dumps(item) + "\n")
 
 
 # Streamlit UI
 st.title("Stock Ticker Tracker with Historical Ranges")
 
-saved_data = load_from_file()
+saved_data = load_from_airtable()
 new_ticker = st.text_input("Enter stock ticker:", "AAPL").strip().upper()
 
 if st.button("Add Ticker"):
@@ -84,23 +88,11 @@ if st.button("Add Ticker"):
     elif validate_ticker(new_ticker):
         price_data = get_price_ranges(new_ticker)
         if price_data:
-            save_to_file(price_data)
+            save_to_airtable(price_data)
             st.success(f"Saved {new_ticker} with price ranges!")
-            st.rerun()  # Refresh to show the new ticker
-    else:
-        st.error("Invalid ticker symbol")
-
-if st.button("Refresh Data"):
-    if saved_data:
-        for item in saved_data:
-            current_price = yf.Ticker(item['ticker']).fast_info["last_price"]
-            alerts = check_and_update_thresholds(item, current_price)
-            if alerts:
-                alert_message = f"Alerts for {item['ticker']}: " + ", ".join(alerts)
-                st.success(alert_message)
-                # Optionally send email alert here
-    else:
-        st.warning("No tickers to refresh")
+            st.rerun()
+        else:
+            st.error("Invalid ticker symbol")
 
 # Display saved data
 if saved_data:
@@ -125,8 +117,7 @@ if saved_data:
         cols[6].write(f"${item['1_month_high']:.2f}")
         cols[7].write(f"${item['1_month_low']:.2f}")
         if cols[8].button("Delete", key=f"delete_{item['ticker']}_{idx}"):
-            saved_data.remove(item)
-            save_all(saved_data)
+            delete_from_airtable(item['ticker'])
             st.success(f"Deleted {item['ticker']}")
             st.rerun()
 
