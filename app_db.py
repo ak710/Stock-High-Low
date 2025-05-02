@@ -98,7 +98,7 @@ if saved_data:
     st.subheader("Saved Tickers with Price Ranges")
     
     # Create table headers
-    headers = ["Ticker", "Current Price","52W High", "52W Low", "6M High", "6M Low", "1M High", "1M Low", "Delete"]
+    headers = ["Ticker","52W High", "52W Low", "6M High", "6M Low", "1M High", "1M Low", "Delete"]
     col_widths = [2,2,2,2,2,2,2,3]
     header_cols = st.columns(col_widths)
     for col, header in zip(header_cols, headers):
