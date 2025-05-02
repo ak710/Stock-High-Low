@@ -99,23 +99,22 @@ if saved_data:
     
     # Create table headers
     headers = ["Ticker", "Current Price","52W High", "52W Low", "6M High", "6M Low", "1M High", "1M Low", "Delete"]
-    col_widths = [2,2,2,2,2,2,2,2,3]
+    col_widths = [2,2,2,2,2,2,2,3]
     header_cols = st.columns(col_widths)
     for col, header in zip(header_cols, headers):
         col.write(f"**{header}**")
 
     for idx, item in enumerate(saved_data):
-        Current_price = yf.Ticker(item['ticker']).fast_info["last_price"]
+        #Current_price = yf.Ticker(item['ticker']).fast_info["last_price"]
         cols = st.columns(col_widths)
         cols[0].write(item['ticker'])
-        cols[1].markdown(f":green[${Current_price:.2f}]")
-        cols[2].write(f"${item['52_week_high']:.2f}")
-        cols[3].write(f"${item['52_week_low']:.2f}")
-        cols[4].write(f"${item['6_month_high']:.2f}")
-        cols[5].write(f"${item['6_month_low']:.2f}")
-        cols[6].write(f"${item['1_month_high']:.2f}")
-        cols[7].write(f"${item['1_month_low']:.2f}")
-        if cols[8].button("Delete", key=f"delete_{item['ticker']}_{idx}"):
+        cols[1].write(f"${item['52_week_high']:.2f}")
+        cols[2].write(f"${item['52_week_low']:.2f}")
+        cols[3].write(f"${item['6_month_high']:.2f}")
+        cols[4].write(f"${item['6_month_low']:.2f}")
+        cols[5].write(f"${item['1_month_high']:.2f}")
+        cols[6].write(f"${item['1_month_low']:.2f}")
+        if cols[7].button("Delete", key=f"delete_{item['ticker']}_{idx}"):
             delete_from_airtable(item['ticker'])
             st.success(f"Deleted {item['ticker']}")
             st.rerun()
