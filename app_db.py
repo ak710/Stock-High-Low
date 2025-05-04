@@ -4,11 +4,15 @@ import os
 import pandas as pd
 from datetime import datetime, timedelta
 import os
+from dotenv import load_dotenv
 from pyairtable import Api
+load_dotenv()
 
-AIRTABLE_TOKEN = st.secrets["AIRTABLE_TOKEN"]
-AIRTABLE_BASE_ID = st.secrets["AIRTABLE_BASE_ID"]
-AIRTABLE_TABLE_NAME = st.secrets["AIRTABLE_TABLE_NAME"]
+AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
+AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
+AIRTABLE_TABLE_NAME = os.getenv("AIRTABLE_TABLE_NAME")
+
+
 
 def get_airtable_table():
     api = Api(AIRTABLE_TOKEN)
@@ -99,7 +103,7 @@ if saved_data:
     
     # Create table headers
     headers = ["Ticker","52W High", "52W Low", "6M High", "6M Low", "1M High", "1M Low", "Delete"]
-    col_widths = [2,2,2,2,2,2,2,3]
+    col_widths = [3,2,2,2,2,2,2,3]
     header_cols = st.columns(col_widths)
     for col, header in zip(header_cols, headers):
         col.write(f"**{header}**")
