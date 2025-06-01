@@ -1,6 +1,6 @@
 pandas==2.2.3
 schedule==1.2.2
 streamlit==1.45.0
-yfinance==0.2.57
+yfinance==0.2.61
 pyairtable
 dotenv
